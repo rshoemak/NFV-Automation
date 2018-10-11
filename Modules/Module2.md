@@ -6,7 +6,7 @@ Inside the imported collection are two folders.  Expand the first one called **I
 
 This collection contains a set of API calls that will be used to complete the processes necessary to instantiate a vEdge.  This is an example of how to do a VNF deployment.  The API calls can be modified for any VM.  
 
-![alt text](../images/Postman - Instantiate Folder.png)
+![alt text](../images/Postman-Instantiate_Folder.png)
 
 Note that we are using different types of REST calls here in order to accomplish the overall project.  Let's explore the first API call ***Download Image 1***.
 
@@ -14,7 +14,7 @@ Click on that API call and examine its details in the main Postman window.
 
 The landing page for the API call shows that we are utiling a **POST** REST action with the API listed after that.  
 
-![alt text](../images/Postman - Download Image Overview.png)
+![alt text](../images/Postman-Download_Image_Overview.png)
 
 We are using a variable for NFVIS here.  If you are unfamiliar with Postman, variables are identified by a **{{XXX}}** format.  That variable can be populated from either the Environment Variables set of variables or potentially from an imported file during a collection run (more on this later).  
 
@@ -22,7 +22,7 @@ Also note on this screen that the Authorization for security accessing our NFVIS
 
 Start by clicking on the ellipsis to the right of the collection's name.  Then select "Edit" to access the settings for the collection.
 
-![alt text](../images/Postman - Change Collection Settings.png)
+![alt text](../images/Postman-Change_Collection_Settings.png)
 
 On the settings screen, move over the the Authorization tab and then modify the username and password to match your NFVIS' settings.  Finally, click on Update to commit these changes. With this completed, our API calls will now inherit this setting for authorizing all calls to NFVIS.
 
@@ -38,7 +38,7 @@ POST https://NFVIS-IP/api/config/vm_lifecycle/images
 
 But this isn't enough information to provide all the details the API call needs.  As you can see, we are providing those neceessary additional details about where NFVIS can download the image in the body field.  
 
-![alt text](../images/Postman - Body for Image Download.png)
+![alt text](../images/Postman-Body_for_Image_Download.png)
 
 In JSON format, we are providing the name of the image we want to import and the source of that image.  This is all done through variables so that it's easy to modify.  Notice that we have provided the FTP-Server variable in the Environment Variables section, but we have not provided the IMAGE1 variable yet.  That will come later.
 
