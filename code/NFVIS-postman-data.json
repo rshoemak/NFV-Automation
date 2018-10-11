@@ -1,0 +1,19 @@
+[
+{
+    "NFVIS": "https://10.91.13.183",
+    "BR2": "wan2-br",
+    "BR3": "mgmt-br",
+    "NET2": "wan2-net",
+    "NET3": "mgmt-net",
+    "VEDGENAME": "vEdge1",
+    "IMAGE1": "vedge-18-3-1.tar.gz",
+    "IMAGE2": "steelhead.tar.gz",
+    "FLAVOR": "vEdge-Small",
+    "ORGNAME": "Chicago Central Lab",
+    "SITEID": "1800",
+    "SYSTEMIP": "172.16.255.78",
+    "VBOND": "10.91.13.155",
+    "UUID": "274eacee-bf50-0515-4be8-ac0b30b1f7a0",
+    "OTP": "5bc9b55c9b6358d9c145c3c41a295e5c"
+}
+]
