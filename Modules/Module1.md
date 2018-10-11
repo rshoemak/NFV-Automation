@@ -12,7 +12,7 @@ After importing the Collection, note it is comprised of two folders and a couple
 of extra API commands.  The first folder contains a series of API calls used to instantiate a VNF on
 NFVIS.  The second folder is used for cleanup.  
 
-![alt text](../images/Postman - Collection Import.png)
+![alt text](../images/Postman-Collection_Import.png)
 
 Opening the folder "Instantiate vEdge on CSP" shows a list of API calls that would be used serially in order to build up the components inside NFVIS such as downloading the image, creating the virtual bridges and networks, and mapping those virtual networks to the correct physical interface on the CSP.  Once those components are enabled, the final API call spins up the vEdge.
 
@@ -22,7 +22,7 @@ We will explore some of these individual APIs in the next step.
 
 Near the top right of Postman, you set your Environment.  Since you just imported an Environment file, let's select that one to use for our testing.  It is called **NFV-Environment**
 
-![alt text](../images/Postman - Changing Environment.png)
+![alt text](../images/Postman-Changing_Environment.png)
 
 Once you have selected the environment, click on the eye icon to the right to examine the variables.  There are four variables that are part of the Environment settings:  
 
@@ -33,7 +33,7 @@ Once you have selected the environment, click on the eye icon to the right to ex
 
 Leave the *Content-Type* and *Accept* variables alone.  Modify the IP address and FTP path for your system.
 
-![alt text](../images/Postman - Modifying Environment Variables.png)
+![alt text](../images/Postman-Modifying_Environment_Variables.png)
 
 
 ### [Next Step - Exploring The First API Call](Module2.md)

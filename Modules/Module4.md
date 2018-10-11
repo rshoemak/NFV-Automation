@@ -6,7 +6,7 @@ Let's take a moment to return to the REST APIs that were created to make this co
 
 Returning to our Collection, and selecting the first API call once more "Download Image 1", select the Tests tab under the API itself, this is the final tab.
 
-![alt text](../images/Postman - Download Image Tests.png)
+![alt text](../images/Postman-Download_Image_Tests.png)
 
 These Tests allow simple additional javascript coding after the API call is executed.  In this first API, we can see that the here we are simply running a check to validate we receive the correct HTML response code for downloading the image file.  A 409 indicates the file is already present in NFVIS, and a 201 indicates that the REST call was sucessfully starteed.  The keyword ```tests``` in this code snippet is actually used by Postman to provide a pass or fail check on the named test in parenthesis.  This way, when you run a collection of APIs, tests like this can be run at each stage along the way to validate whether the API call worked correctly or didn't.  
 
@@ -14,7 +14,7 @@ Barring any additional direction, once this call is complete, Collection Runner 
 
 Examining the next API, "Get Image 1 Status" shows a little more extra code in its Tests section.
 
-![alt text](../images/Postman - Get Image Status Tests.png)
+![alt text](../images/Postman-Get_Image_Status_Tests.png)
 
 What this snippet of script is doing is simply checking the value of the "state" field from the returned data and validating whether the image is in an "active" state.  After making this check, there are two possible outcomes.  If it is active, we tell Postman Collection Runner to set the next API call to now be "Get Image 2 Status", if not, we set the next call to be "Insert 10 Second Delay - IMG1".
 
