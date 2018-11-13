@@ -1,19 +1,22 @@
 [
 {
     "NFVIS": "https://10.91.13.183",
-    "BR2": "wan2-br",
-    "BR3": "mgmt-br",
-    "NET2": "wan2-net",
-    "NET3": "mgmt-net",
     "VEDGENAME": "vEdge1",
+    "RBEDNAME": "Steelhead1",
     "IMAGE1": "vedge-18-3-1.tar.gz",
-    "IMAGE2": "steelhead.tar.gz",
-    "FLAVOR": "vEdge-Small",
+    "IMAGE2": "riverbed.tar.gz",
+    "FLAVOR1": "vEdge-Small",
+    "FLAVOR2": "riverbed-small",
     "ORGNAME": "Chicago Central Lab",
     "SITEID": "1800",
     "SYSTEMIP": "172.16.255.78",
     "VBOND": "10.91.13.155",
     "UUID": "274eacee-bf50-0515-4be8-ac0b30b1f7a0",
-    "OTP": "5bc9b55c9b6358d9c145c3c41a295e5c"
+    "OTP": "83f960d6847330e9b9e6c637df6d46e9",
+    "LAN_IP": "172.16.71.1/24",
+    "INPATH_IP_ADDRESS": "172.16.78.2",
+    "GATEWAY": "172.16.78.1",
+    "HOSTNAME": "vRBED1",
+    "SCC_SERVER_IP": "172.16.118.75"
 }
 ]

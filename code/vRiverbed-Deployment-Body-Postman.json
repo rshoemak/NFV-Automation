@@ -1,11 +1,11 @@
 {
   "deployment": {
-    "name": "{{VEDGENAME}}",
+    "name": "{{RBEDNAME}}",
     "vm_group": {
-      "name": "{{VEDGENAME}}",
-      "image": "{{IMAGE1}}",
-      "flavor": "{{FLAVOR1}}",
-      "vim_vm_name": "{{VEDGENAME}}",
+      "name": "{{RBEDNAME}}",
+      "image": "{{IMAGE2}}",
+      "flavor": "{{FLAVOR2}}",
+      "vim_vm_name": "{{RBEDNAME}}",
       "bootup_time": -1,
       "recovery_wait_time": 0,
       "interfaces": {
@@ -17,12 +17,12 @@
           {
           "nicid": 1,
           "model": "virtio",
-          "network": "wan-net"
+          "network": "{{NET5}}"
           },
           {
           "nicid": 2,
           "model": "virtio",
-          "network": "{{NET2}}"
+          "network": "lan-net"
           },
           {
           "nicid": 3,
@@ -62,28 +62,20 @@
         "configuration": {
           "dst": "bootstrap_config",
           "variable": [{
-            "name": "ORGNAME",
-            "val": "{{ORGNAME}}"
+            "name": "INPATH_IP_ADDRESS",
+            "val": "{{INPATH_IP_ADDRESS}}"
             },
             {
-            "name": "OTP",
-            "val": "{{OTP}}"
+            "name": "GATEWAY",
+            "val": "{{GATEWAY}}"
             },
             {
-            "name": "SITEID",
-            "val": "{{SITEID}}"
+            "name": "HOSTNAME",
+            "val": "{{HOSTNAME}}"
             },
             {
-            "name": "SYSTEMIP",
-            "val": "{{SYSTEMIP}}"
-            },
-            {
-            "name": "UUID",
-            "val": "{{UUID}}"
-            },
-            {
-            "name": "VBOND",
-            "val": "{{VBOND}}"
+            "name": "SCC_SERVER_IP",
+            "val": "{{SCC_SERVER_IP}}"
             }
           ]
         }
