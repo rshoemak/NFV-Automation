@@ -141,7 +141,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"image\": [{\r\n    \"name\": \"vedge-18-3-1-test\",\r\n    \"src\": \"ftp://cisco:cisco@172.16.118.121/vedge-18-3-1.tar.gz\"\r\n\t},\r\n\t{\r\n\t\"name\": \"riverbed-test\",\r\n\t\"src\": \"ftp://cisco:cisco@172.16.118.121/steelhead.tar.gz\"\r\n\t}\r\n  ]\r\n}"
+							"raw": ""
 						},
 						"url": {
 							"raw": "{{NFVIS}}/api/operational/vm_lifecycle/opdata/images/image/{{IMAGE1}}?deep",
@@ -238,7 +238,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"image\": [{\r\n    \"name\": \"vedge-18-3-1-test\",\r\n    \"src\": \"ftp://cisco:cisco@172.16.118.121/vedge-18-3-1.tar.gz\"\r\n\t},\r\n\t{\r\n\t\"name\": \"riverbed-test\",\r\n\t\"src\": \"ftp://cisco:cisco@172.16.118.121/steelhead.tar.gz\"\r\n\t}\r\n  ]\r\n}"
+							"raw": ""
 						},
 						"url": {
 							"raw": "{{NFVIS}}/api/operational/vm_lifecycle/opdata/images/image/{{IMAGE2}}?deep",
@@ -459,16 +459,62 @@
 					"response": []
 				},
 				{
-					"name": "Assign WAN2 Bridge to Port",
+					"name": "Remove Eth1 from LAN-br",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"id": "3d44a07f-0bf4-4923-9d0c-53d096754fdd",
-								"type": "text/javascript",
+								"exec": [
+									"tests[\"Changed Ports Assigned to LAN-Net\"] = responseCode.code === 204"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"bridge\": {\r\n    \"name\": \"lan-br\",\r\n    \"port\": [\r\n    \t{\r\n\t\t\"name\": \"eth2\"\r\n\t\t},\r\n\t\t{\r\n\t\t\"name\": \"eth3\"\r\n\t\t},\r\n\t\t{\r\n\t\t\"name\": \"eth4\"\r\n\t\t},\r\n\t\t{\r\n\t\t\"name\": \"eth5\"\r\n\t\t}\r\n\t]\t\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/bridges/bridge/lan-br",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"bridges",
+								"bridge",
+								"lan-br"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign WAN2 to Eth1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3d44a07f-0bf4-4923-9d0c-53d096754fdd",
 								"exec": [
 									"tests[\"WAN2 Mapped to Ethernet 2\"] = responseCode.code === 204"
-								]
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
@@ -499,6 +545,92 @@
 								"bridges",
 								"bridge",
 								"{{BR2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get vEdge Info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "706185f1-7e7c-481f-a926-634fbe19f0cb",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"//console.log(jsonData[\"data\"][0][\"serialNumber\"]);",
+									"tests[\"Grabbing One Time Password\"] = responseCode.code === 200;",
+									"postman.setEnvironmentVariable(\"UUID\", jsonData[\"data\"][0][\"uuid\"]);",
+									"postman.setEnvironmentVariable(\"OTP\", jsonData[\"data\"][0][\"serialNumber\"]);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "C1sc0_123",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "saveHelperData",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "showPassword",
+									"value": false,
+									"type": "boolean"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{vManage}}/dataservice/system/device/vedges?uuid={{UUID}}",
+							"host": [
+								"{{vManage}}"
+							],
+							"path": [
+								"dataservice",
+								"system",
+								"device",
+								"vedges"
+							],
+							"query": [
+								{
+									"key": "uuid",
+									"value": "{{UUID}}"
+								},
+								{
+									"key": null,
+									"value": null
+								},
+								{
+									"key": null,
+									"value": null
+								}
 							]
 						}
 					},
@@ -553,94 +685,6 @@
 					"response": []
 				},
 				{
-					"name": "Get vEdge Template ID",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "5697014f-1ddb-43bd-8862-c978ffb07c52",
-								"exec": [
-									"var jsonData = JSON.parse(responseBody);",
-									"// Identify which template we need to find.",
-									"var template = postman.getEnvironmentVariable(\"template-name\");",
-									"",
-									"for (var data in jsonData) {",
-									"    // Iterate through the array of data for the various tempalates",
-									"    for (var i = 0; i < jsonData[data].length; i++) {",
-									"        // Use the index (i) to assign the current tamplate name to the variable curTemp",
-									"        var curTemp = jsonData[\"data\"][i][\"templateName\"];",
-									"        // Use a match condition to identify the template of interest",
-									"        if (curTemp === template) {",
-									"            // Assign Environment Variables for the template ID to be used later.",
-									"            postman.setEnvironmentVariable(\"templateId\", jsonData[\"data\"][i][\"templateId\"]);",
-									"        }",
-									"    }",
-									"}",
-									"",
-									"tests[\"Found vEdge Template ID\"] = responseCode.code === 200;"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "basic",
-							"basic": [
-								{
-									"key": "password",
-									"value": "C1sc0_123",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "admin",
-									"type": "string"
-								},
-								{
-									"key": "saveHelperData",
-									"value": false,
-									"type": "boolean"
-								},
-								{
-									"key": "showPassword",
-									"value": false,
-									"type": "boolean"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{vManage}}/dataservice/template/device",
-							"host": [
-								"{{vManage}}"
-							],
-							"path": [
-								"dataservice",
-								"template",
-								"device"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get vEdge Status",
 					"event": [
 						{
@@ -667,8 +711,8 @@
 									"tests[\"Checking vEdge Status\"] = responseCode.code === 200;",
 									"",
 									"if (devStatus == \"connected\"){",
-									"    tests[\"vEdge Registered to vCenter\"] = responseCode.code === 200;",
-									"    postman.setNextRequest(\"Attach Template to vEdge\");",
+									"    tests[\"vEdge Registered to vManage\"] = responseCode.code === 200;",
+									"    postman.setNextRequest(\"Get vEdge Template ID\");",
 									"} else {",
 									"    postman.setNextRequest(\"Insert 10 Second Delay - vedge\");",
 									"}"
@@ -763,6 +807,96 @@
 							"path": [
 								"delay",
 								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get vEdge Template ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5697014f-1ddb-43bd-8862-c978ffb07c52",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"// Identify which template we need to find.",
+									"var template = postman.getEnvironmentVariable(\"template-name\");",
+									"//console.log(template);",
+									"",
+									"for (var data in jsonData) {",
+									"    // Iterate through the array of data for the various tempalates",
+									"    for (var i = 0; i < jsonData[data].length; i++) {",
+									"        // Use the index (i) to assign the current tamplate name to the variable curTemp",
+									"        var curTemp = jsonData[\"data\"][i][\"templateName\"];",
+									"        //console.log(curTemp);",
+									"        // Use a match condition to identify the template of interest",
+									"        if (curTemp === template) {",
+									"            // Assign Environment Variables for the template ID to be used later.",
+									"            postman.setEnvironmentVariable(\"templateId\", jsonData[\"data\"][i][\"templateId\"]);",
+									"            tests[\"Found vEdge Template ID\"] = curTemp === template;",
+									"            console.log(jsonData[\"data\"][i][\"templateId\"]);",
+									"        }",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "C1sc0_123",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "saveHelperData",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "showPassword",
+									"value": false,
+									"type": "boolean"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{vManage}}/dataservice/template/device",
+							"host": [
+								"{{vManage}}"
+							],
+							"path": [
+								"dataservice",
+								"template",
+								"device"
 							]
 						}
 					},
@@ -869,7 +1003,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"deployment\": {\n    \"name\": \"{{RBEDNAME}}\",\n    \"vm_group\": {\n      \"name\": \"{{RBEDNAME}}\",\n      \"image\": \"{{IMAGE2}}\",\n      \"flavor\": \"{{FLAVOR2}}\",\n      \"vim_vm_name\": \"{{RBEDNAME}}\",\n      \"bootup_time\": -1,\n      \"recovery_wait_time\": 0,\n      \"interfaces\": {\n        \"interface\": [{\n          \"nicid\": 0,\n          \"model\": \"virtio\",\n          \"network\": \"lan-net\"\n          },\n          {\n          \"nicid\": 1,\n          \"model\": \"virtio\",\n          \"network\": \"{{NET5}}\"\n          },\n          {\n          \"nicid\": 2,\n          \"model\": \"virtio\",\n          \"network\": \"lan-net\"\n          },\n          {\n          \"nicid\": 3,\n          \"model\": \"virtio\",\n          \"network\": \"{{NET4}}\"\n          }\n        ]\n      },\n      \"kpi_data\": {\n        \"kpi\": {\n          \"event_name\": \"VM_ALIVE\",\n          \"metric_value\": \"1\",\n          \"metric_cond\": \"GT\",\n          \"metric_type\": \"UINT32\",\n          \"metric_collector\": {\n            \"type\": \"ICMPPing\",\n            \"nicid\": 0,\n            \"poll_frequency\": 3,\n            \"polling_unit\": \"seconds\",\n            \"continuous_alarm\": false\n          }\n        }\n      },\n      \"rules\": {\n        \"admin_rules\": {\n          \"rule\": {\n            \"event_name\": \"VM_ALIVE\",\n            \"action\": [\n              \"ALWAYS log\",\n              \"FALSE recover autohealing\",\n              \"TRUE servicebooted.sh\"\n            ]\n          }\n        }\n      },\n      \"config_data\": {\n        \"configuration\": {\n          \"dst\": \"bootstrap_config\",\n          \"variable\": [{\n            \"name\": \"INPATH_IP_ADDRESS\",\n            \"val\": \"{{INPATH_IP_ADDRESS}}\"\n            },\n            {\n            \"name\": \"GATEWAY\",\n            \"val\": \"{{GATEWAY}}\"\n            },\n            {\n            \"name\": \"HOSTNAME\",\n            \"val\": \"{{HOSTNAME}}\"\n            },\n            {\n            \"name\": \"SCC_SERVER_IP\",\n            \"val\": \"{{SCC_SERVER_IP}}\"\n            }\n          ]\n        }\n      }\n    }\n  }\n}"
+							"raw": "{\n  \"deployment\": {\n    \"name\": \"{{RBEDNAME}}\",\n    \"vm_group\": {\n      \"name\": \"{{RBEDNAME}}\",\n      \"image\": \"{{IMAGE2}}\",\n      \"flavor\": \"{{FLAVOR2}}\",\n      \"vim_vm_name\": \"{{RBEDNAME}}\",\n      \"bootup_time\": -1,\n      \"recovery_wait_time\": 0,\n      \"interfaces\": {\n        \"interface\": [{\n          \"nicid\": 0,\n          \"model\": \"virtio\",\n          \"network\": \"lan-net\"\n          },\n          {\n          \"nicid\": 1,\n          \"model\": \"virtio\",\n          \"network\": \"{{NET5}}\"\n          },\n          {\n          \"nicid\": 2,\n          \"model\": \"virtio\",\n          \"network\": \"lan-net\"\n          },\n          {\n          \"nicid\": 3,\n          \"model\": \"virtio\",\n          \"network\": \"{{NET4}}\"\n          }\n        ]\n      },\n      \"kpi_data\": {\n        \"kpi\": {\n          \"event_name\": \"VM_ALIVE\",\n          \"metric_value\": \"1\",\n          \"metric_cond\": \"GT\",\n          \"metric_type\": \"UINT32\",\n          \"metric_collector\": {\n            \"type\": \"ICMPPing\",\n            \"nicid\": 0,\n            \"poll_frequency\": 3,\n            \"polling_unit\": \"seconds\",\n            \"continuous_alarm\": false\n          }\n        }\n      },\n      \"rules\": {\n        \"admin_rules\": {\n          \"rule\": {\n            \"event_name\": \"VM_ALIVE\",\n            \"action\": [\n              \"ALWAYS log\",\n              \"FALSE recover autohealing\",\n              \"TRUE servicebooted.sh\"\n            ]\n          }\n        }\n      },\n      \"config_data\": {\n        \"configuration\": {\n          \"dst\": \"bootstrap_config\",\n          \"variable\": [{\n            \"name\": \"INPATH_IP_ADDRESS\",\n            \"val\": \"{{INPATH_IP_ADDRESS}}\"\n            },\n            {\n            \"name\": \"GATEWAY\",\n            \"val\": \"{{GATEWAY}}\"\n            },\n            {\n            \"name\": \"HOSTNAME\",\n            \"val\": \"{{RBEDNAME}}\"\n            },\n            {\n            \"name\": \"SCC_SERVER_IP\",\n            \"val\": \"{{SCC_SERVER_IP}}\"\n            }\n          ]\n        }\n      }\n    }\n  }\n}"
 						},
 						"url": {
 							"raw": "{{NFVIS}}/api/config/vm_lifecycle/tenants/tenant/admin/deployments",
@@ -970,13 +1104,12 @@
 							"listen": "test",
 							"script": {
 								"id": "bf7b2d1c-8159-433a-abda-57a9693a1362",
-								"type": "text/javascript",
 								"exec": [
 									"if (responseCode.code === 204) {",
 									"    // Check to ensure there is at least 1 VNF running.",
-									"    console.log(responseCode.code);",
+									"    //console.log(responseCode.code);",
 									"    postman.setNextRequest(\"Get Networks\");",
-									"    tests[\"No VNFs Deployed\"] = responseCode.code === 204",
+									"    tests[\"No VNFs Deployed\"] = responseCode.code === 204;",
 									"}",
 									"else {",
 									"  var jsonData = JSON.parse(responseBody);",
@@ -989,7 +1122,8 @@
 									"      postman.setNextRequest(\"Delete VNF\");",
 									"  }",
 									"}"
-								]
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
@@ -1130,7 +1264,6 @@
 							"listen": "test",
 							"script": {
 								"id": "1f3e0686-42d7-43ba-b4b9-ed566c893aa6",
-								"type": "text/javascript",
 								"exec": [
 									"var jsonData = JSON.parse(responseBody);",
 									"var numberNets = jsonData[\"network:networks\"][\"network\"].length;",
@@ -1146,9 +1279,10 @@
 									"    postman.setNextRequest(\"Delete Extra Network\");",
 									"  }",
 									"else {",
-									"  postman.setNextRequest(\"Get System Information\");",
+									"  postman.setNextRequest(\"Assign Ethernets Back to LAN Net\");",
 									"}"
-								]
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
@@ -1289,6 +1423,52 @@
 					"response": []
 				},
 				{
+					"name": "Assign Ethernets Back to LAN Net",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3d44a07f-0bf4-4923-9d0c-53d096754fdd",
+								"exec": [
+									"tests[\"Changed Ports Assigned to LAN-Net\"] = responseCode.code === 204"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"bridge\": {\r\n    \"name\": \"lan-br\",\r\n    \"port\": [\r\n    \t{\r\n\t\t\"name\": \"eth1\"\r\n\t\t},\r\n    \t{\r\n\t\t\"name\": \"eth2\"\r\n\t\t},\r\n\t\t{\r\n\t\t\"name\": \"eth3\"\r\n\t\t},\r\n\t\t{\r\n\t\t\"name\": \"eth4\"\r\n\t\t},\r\n\t\t{\r\n\t\t\"name\": \"eth5\"\r\n\t\t}\r\n\t]\t\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/bridges/bridge/lan-br",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"bridges",
+								"bridge",
+								"lan-br"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get System Information",
 					"event": [
 						{
@@ -1316,7 +1496,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"image\": [{\r\n    \"name\": \"vedge-18-3-1-test\",\r\n    \"src\": \"ftp://cisco:cisco@172.16.118.121/vedge-18-3-1.tar.gz\"\r\n\t},\r\n\t{\r\n\t\"name\": \"riverbed-test\",\r\n\t\"src\": \"ftp://cisco:cisco@172.16.118.121/steelhead.tar.gz\"\r\n\t}\r\n  ]\r\n}"
+							"raw": ""
 						},
 						"url": {
 							"raw": "{{NFVIS}}/api/config/system/settings",
@@ -1363,7 +1543,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"image\": [{\r\n    \"name\": \"vedge-18-3-1-test\",\r\n    \"src\": \"ftp://cisco:cisco@172.16.118.121/vedge-18-3-1.tar.gz\"\r\n\t},\r\n\t{\r\n\t\"name\": \"riverbed-test\",\r\n\t\"src\": \"ftp://cisco:cisco@172.16.118.121/steelhead.tar.gz\"\r\n\t}\r\n  ]\r\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{NFVIS}}/api/config/vm_lifecycle/images",
@@ -1408,7 +1588,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"image\": [{\r\n    \"name\": \"vedge-18-3-1-test\",\r\n    \"src\": \"ftp://cisco:cisco@172.16.118.121/vedge-18-3-1.tar.gz\"\r\n\t},\r\n\t{\r\n\t\"name\": \"riverbed-test\",\r\n\t\"src\": \"ftp://cisco:cisco@172.16.118.121/steelhead.tar.gz\"\r\n\t}\r\n  ]\r\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{NFVIS}}/api/operational/system/settings-native",
@@ -1420,6 +1600,112 @@
 						"operational",
 						"system",
 						"settings-native"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get VM Flavor Info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "57d91df3-f988-4c0b-bca4-4b497213f23e",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "{{Content-Type}}"
+					},
+					{
+						"key": "Accept",
+						"value": "{{Accept}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{NFVIS}}/api/config/vm_lifecycle/flavors/flavor/ISRv-small?deep",
+					"host": [
+						"{{NFVIS}}"
+					],
+					"path": [
+						"api",
+						"config",
+						"vm_lifecycle",
+						"flavors",
+						"flavor",
+						"ISRv-small"
+					],
+					"query": [
+						{
+							"key": "deep",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Image Information",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "57d91df3-f988-4c0b-bca4-4b497213f23e",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "{{Content-Type}}"
+					},
+					{
+						"key": "Accept",
+						"value": "{{Accept}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{NFVIS}}/api/config/vm_lifecycle/images/image/isrv-universalk9.16.05.01.tar.gz?deep",
+					"host": [
+						"{{NFVIS}}"
+					],
+					"path": [
+						"api",
+						"config",
+						"vm_lifecycle",
+						"images",
+						"image",
+						"isrv-universalk9.16.05.01.tar.gz"
+					],
+					"query": [
+						{
+							"key": "deep",
+							"value": null
+						}
 					]
 				}
 			},
