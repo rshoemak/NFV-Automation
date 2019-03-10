@@ -1,0 +1,93 @@
+{
+  "deployment": {
+    "name": "{{VEDGENAME}}",
+    "vm_group": {
+      "name": "{{VEDGENAME}}",
+      "image": "{{IMAGE1}}",
+      "flavor": "{{FLAVOR1}}",
+      "vim_vm_name": "{{VEDGENAME}}",
+      "bootup_time": -1,
+      "recovery_wait_time": 0,
+      "interfaces": {
+        "interface": [{
+          "nicid": 0,
+          "model": "virtio",
+          "network": "{{NET3}}"
+          },
+          {
+          "nicid": 1,
+          "model": "virtio",
+          "network": "wan-net"
+          },
+          {
+          "nicid": 2,
+          "model": "virtio",
+          "network": "{{NET2}}"
+          },
+          {
+          "nicid": 3,
+          "model": "virtio",
+          "network": "{{NET4}}"
+          }
+        ]
+      },
+      "kpi_data": {
+        "kpi": {
+          "event_name": "VM_ALIVE",
+          "metric_value": "1",
+          "metric_cond": "GT",
+          "metric_type": "UINT32",
+          "metric_collector": {
+            "type": "ICMPPing",
+            "nicid": 0,
+            "poll_frequency": 3,
+            "polling_unit": "seconds",
+            "continuous_alarm": false
+          }
+        }
+      },
+      "rules": {
+        "admin_rules": {
+          "rule": {
+            "event_name": "VM_ALIVE",
+            "action": [
+              "ALWAYS log",
+              "FALSE recover autohealing",
+              "TRUE servicebooted.sh"
+            ]
+          }
+        }
+      },
+      "config_data": {
+        "configuration": {
+          "dst": "bootstrap_config",
+          "variable": [{
+            "name": "ORGNAME",
+            "val": "{{ORGNAME}}"
+            },
+            {
+            "name": "OTP",
+            "val": "{{OTP}}"
+            },
+            {
+            "name": "SITEID",
+            "val": "{{SITEID}}"
+            },
+            {
+            "name": "SYSTEMIP",
+            "val": "{{SYSTEMIP}}"
+            },
+            {
+            "name": "UUID",
+            "val": "{{UUID}}"
+            },
+            {
+            "name": "VBOND",
+            "val": "{{VBOND}}"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

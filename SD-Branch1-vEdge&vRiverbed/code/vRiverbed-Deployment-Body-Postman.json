@@ -1,0 +1,85 @@
+{
+  "deployment": {
+    "name": "{{RBEDNAME}}",
+    "vm_group": {
+      "name": "{{RBEDNAME}}",
+      "image": "{{IMAGE2}}",
+      "flavor": "{{FLAVOR2}}",
+      "vim_vm_name": "{{RBEDNAME}}",
+      "bootup_time": -1,
+      "recovery_wait_time": 0,
+      "interfaces": {
+        "interface": [{
+          "nicid": 0,
+          "model": "virtio",
+          "network": "{{NET3}}"
+          },
+          {
+          "nicid": 1,
+          "model": "virtio",
+          "network": "{{NET5}}"
+          },
+          {
+          "nicid": 2,
+          "model": "virtio",
+          "network": "lan-net"
+          },
+          {
+          "nicid": 3,
+          "model": "virtio",
+          "network": "{{NET4}}"
+          }
+        ]
+      },
+      "kpi_data": {
+        "kpi": {
+          "event_name": "VM_ALIVE",
+          "metric_value": "1",
+          "metric_cond": "GT",
+          "metric_type": "UINT32",
+          "metric_collector": {
+            "type": "ICMPPing",
+            "nicid": 0,
+            "poll_frequency": 3,
+            "polling_unit": "seconds",
+            "continuous_alarm": false
+          }
+        }
+      },
+      "rules": {
+        "admin_rules": {
+          "rule": {
+            "event_name": "VM_ALIVE",
+            "action": [
+              "ALWAYS log",
+              "FALSE recover autohealing",
+              "TRUE servicebooted.sh"
+            ]
+          }
+        }
+      },
+      "config_data": {
+        "configuration": {
+          "dst": "bootstrap_config",
+          "variable": [{
+            "name": "INPATH_IP_ADDRESS",
+            "val": "{{INPATH_IP_ADDRESS}}"
+            },
+            {
+            "name": "GATEWAY",
+            "val": "{{GATEWAY}}"
+            },
+            {
+            "name": "HOSTNAME",
+            "val": "{{HOSTNAME}}"
+            },
+            {
+            "name": "SCC_SERVER_IP",
+            "val": "{{SCC_SERVER_IP}}"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+[
+{
+    "NFVIS": "https://10.91.13.218",
+    "VEDGENAME": "BAR-vEdge",
+    "FTDNAME": "BAR-vFTD",
+    "IMAGE1": "vedge-18-3-1.tar.gz",
+    "IMAGE2": "FTDv630.tar.gz",
+    "FLAVOR1": "vEdge-Small",
+    "FLAVOR2": "NGFWv-Small",
+    "ORGNAME": "Chicago Central Lab",
+    "SITEID": "2500",
+    "SYSTEMIP": "172.16.255.120",
+    "VBOND": "10.91.13.155",
+    "UUID": "f72c3955-0b27-b100-7fcd-c7d5dd1689a9",
+    "LAN_IP": "172.16.128.1/24",
+    "FTD_PASSWORD": "C1sco12345",
+    "DNS_IP_ADDRESS": "172.16.118.120",
+    "FIREWALL_MODE": "ROUTED",
+    "FTD_GATEWAY": "172.16.128.1",
+    "FMC_IP_ADDRESS": "172.16.118.95",
+    "FMC_REG_KEY": "C1sco12345",
+    "FTD_MGMT_ADDRESS": "172.16.128.5"
+}
+]
+
+
+ADMIN_PASSWORD
+DNS_IP_ADDRESS
+FIREWALL_MODE
+FMC_IP_ADDRESS
+FMC_REG_KEY
+HOSTNAME
+MGMT_GATEWAY
+MGMT_IP_ADDRESS
+MGMT_MASK

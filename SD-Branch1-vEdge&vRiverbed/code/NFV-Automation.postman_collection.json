@@ -1,0 +1,1994 @@
+{
+	"info": {
+		"_postman_id": "ceda44d4-333c-4bb5-bfa1-e5e3f28751b0",
+		"name": "NFV-Automation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Instantiate vEdge and vRiverbed  on CSP",
+			"item": [
+				{
+					"name": "Download Image 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dcd369bd-a382-4b82-b591-f26ca647383e",
+								"type": "text/javascript",
+								"exec": [
+									"if (responseCode.code == 409){",
+									" tests[\"Image 1 Already There\"] = responseCode.code === 409;",
+									"} else {",
+									"  tests[\"Image 1 Started Downloading\"] = responseCode.code === 201;",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"image\": [{\r\n    \"name\": \"{{IMAGE1}}\",\r\n    \"src\": \"{{FTP-Server}}{{IMAGE1}}\"\r\n  }\r\n  ]\r\n}"
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/vm_lifecycle/images",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"vm_lifecycle",
+								"images"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download Image 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "36c26847-b61a-4d76-b0da-88deb35cbc07",
+								"type": "text/javascript",
+								"exec": [
+									"if (responseCode.code == 409){",
+									" tests[\"Image 2 Already There\"] = responseCode.code === 409;",
+									"} else {",
+									"  tests[\"Image 2 Started Downloading\"] = responseCode.code === 201;",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"image\": [{\r\n    \"name\": \"{{IMAGE2}}\",\r\n    \"src\": \"{{FTP-Server}}{{IMAGE2}}\"\r\n  }\r\n  ]\r\n}"
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/vm_lifecycle/images",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"vm_lifecycle",
+								"images"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Networks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fc057645-9a40-46bb-9c55-721437ded9ef",
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"for (var deployment in jsonData) {",
+									"  for (var i = 2; i < jsonData[\"network:networks\"][\"network\"].length; i++) {",
+									"      //Iterate through the loop for each network beyond the original two.",
+									"      var netName = jsonData[\"network:networks\"][\"network\"][i][\"name\"];",
+									"      var brName = jsonData[\"network:networks\"][\"network\"][i][\"bridge\"];",
+									"      //Assign netName and bridgeName for the current network and bridgee ",
+									"      postman.setEnvironmentVariable(\"NET\"+i, netName);",
+									"      postman.setEnvironmentVariable(\"BR\"+i, brName);",
+									"      //Set the Environment variable with the current iterated name.",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/networks?deep",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"networks"
+							],
+							"query": [
+								{
+									"key": "deep",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Image 1 Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "731b00a2-21e9-4751-9a13-c49a0950e29e",
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"if (jsonData[\"vmlc:image\"][\"state\"] == \"IMAGE_ACTIVE_STATE\"){",
+									"    tests[\"vEdge Finished Downloading\"] = responseBody.has(\"IMAGE_ACTIVE_STATE\");",
+									"    postman.setNextRequest(\"Get Image 2 Status\");",
+									"} else {",
+									"    postman.setNextRequest(\"Insert 10 Second Delay - IMG1\");",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/operational/vm_lifecycle/opdata/images/image/{{IMAGE1}}?deep",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"operational",
+								"vm_lifecycle",
+								"opdata",
+								"images",
+								"image",
+								"{{IMAGE1}}"
+							],
+							"query": [
+								{
+									"key": "deep",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert 10 Second Delay - IMG1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "eee97938-cd4c-4bb1-8069-88c3e988612d",
+								"exec": [
+									"postman.setNextRequest(\"Get Image 1 Status\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://postman-echo.com/delay/10",
+							"protocol": "https",
+							"host": [
+								"postman-echo",
+								"com"
+							],
+							"path": [
+								"delay",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Image 2 Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b17b7fd6-981e-4d0f-a347-3f60469cc603",
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"if (jsonData[\"vmlc:image\"][\"state\"] == \"IMAGE_ACTIVE_STATE\"){",
+									"    tests[\"Image 2 Finished Downloading\"] = responseBody.has(\"IMAGE_ACTIVE_STATE\");",
+									"    postman.setNextRequest(\"Create Bridges\");",
+									"} else {",
+									"    postman.setNextRequest(\"Insert 10 Second Delay - IMG2\");",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/operational/vm_lifecycle/opdata/images/image/{{IMAGE2}}?deep",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"operational",
+								"vm_lifecycle",
+								"opdata",
+								"images",
+								"image",
+								"{{IMAGE2}}"
+							],
+							"query": [
+								{
+									"key": "deep",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert 10 Second Delay - IMG2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7347a3c7-51a6-4ba7-b3db-083e272edcc4",
+								"exec": [
+									"postman.setNextRequest(\"Get Image 2 Status\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://postman-echo.com/delay/10",
+							"protocol": "https",
+							"host": [
+								"postman-echo",
+								"com"
+							],
+							"path": [
+								"delay",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Bridges",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f256d565-8159-473e-bbc6-1be4573f657c",
+								"exec": [
+									"if (responseCode.code == 409){",
+									" tests[\"Bridges Already There\"] = responseCode.code === 409;",
+									"} else {",
+									" tests[\"Bridges Were Created\"] = responseCode.code === 201;",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"bridge\": [{\r\n    \"name\": \"{{BR2}}\"\r\n  },\r\n  {\r\n  \"name\": \"{{BR3}}\"\r\n  },\r\n  {\r\n  \"name\": \"{{BR4}}\"\r\n  },\r\n  {\r\n  \"name\": \"{{BR5}}\"\r\n  }\r\n  ]\r\n}"
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/bridges",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"bridges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Networks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "895c240d-f58a-432e-a94c-96a0a2a62f01",
+								"exec": [
+									"if (responseCode.code == 409){",
+									" tests[\"Networks Already There\"] = responseCode.code === 409;",
+									"} else {",
+									" tests[\"Networks Were Created\"] = responseCode.code === 201;",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"network\": [{\r\n    \"name\": \"{{NET2}}\",\r\n    \"bridge\": \"{{BR2}}\"\r\n  },\r\n  {\r\n  \"name\": \"{{NET3}}\",\r\n  \"bridge\": \"{{BR3}}\"\r\n  },\r\n  {\r\n  \"name\": \"{{NET4}}\",\r\n  \"bridge\": \"{{BR4}}\"\r\n  },\r\n  {\r\n  \"name\": \"{{NET5}}\",\r\n  \"bridge\": \"{{BR5}}\"\r\n  }\r\n  ]\r\n}"
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/networks",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"networks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Eth1 from LAN-br",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3d44a07f-0bf4-4923-9d0c-53d096754fdd",
+								"exec": [
+									"tests[\"Changed Ports Assigned to LAN-Net\"] = responseCode.code === 204"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"bridge\": {\r\n    \"name\": \"lan-br\",\r\n    \"port\": [\r\n      {\r\n    \"name\": \"eth2\"\r\n    },\r\n    {\r\n    \"name\": \"eth3\"\r\n    },\r\n    {\r\n    \"name\": \"eth4\"\r\n    },\r\n    {\r\n    \"name\": \"eth5\"\r\n    }\r\n  ]  \r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/bridges/bridge/lan-br",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"bridges",
+								"bridge",
+								"lan-br"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign WAN2 to Eth1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3d44a07f-0bf4-4923-9d0c-53d096754fdd",
+								"exec": [
+									"tests[\"WAN2 Mapped to Ethernet 2\"] = responseCode.code === 204"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"bridge\": {\r\n    \"name\": \"{{BR2}}\",\r\n    \"port\": {\r\n    \"name\": \"eth1\"\r\n    }\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/bridges/bridge/{{BR2}}",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"bridges",
+								"bridge",
+								"{{BR2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get vEdge Info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "706185f1-7e7c-481f-a926-634fbe19f0cb",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"tests[\"Grabbing One Time Password\"] = responseCode.code === 200;",
+									"postman.setEnvironmentVariable(\"UUID\", jsonData[\"data\"][0][\"uuid\"]);",
+									"postman.setEnvironmentVariable(\"OTP\", jsonData[\"data\"][0][\"serialNumber\"]);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "C1sc0_123",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "saveHelperData",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "showPassword",
+									"value": false,
+									"type": "boolean"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{vManage}}/dataservice/system/device/vedges?uuid={{UUID}}",
+							"host": [
+								"{{vManage}}"
+							],
+							"path": [
+								"dataservice",
+								"system",
+								"device",
+								"vedges"
+							],
+							"query": [
+								{
+									"key": "uuid",
+									"value": "{{UUID}}"
+								},
+								{
+									"key": null,
+									"value": null
+								},
+								{
+									"key": null,
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deploy vEdge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4211518b-59ae-4be3-9709-4bfd3dfb3ab4",
+								"exec": [
+									"tests[\"vEdge Started Deploying\"] = responseCode.code === 201"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"deployment\": {\r\n    \"name\": \"{{VEDGENAME}}\",\r\n    \"vm_group\": {\r\n      \"name\": \"{{VEDGENAME}}\",\r\n      \"image\": \"{{IMAGE1}}\",\r\n      \"flavor\": \"{{FLAVOR1}}\",\r\n      \"vim_vm_name\": \"{{VEDGENAME}}\",\r\n      \"bootup_time\": -1,\r\n      \"recovery_wait_time\": 0,\r\n      \"interfaces\": {\r\n        \"interface\": [{\r\n          \"nicid\": 0,\r\n          \"model\": \"virtio\",\r\n          \"network\": \"{{NET3}}\"\r\n          },\r\n          {\r\n          \"nicid\": 1,\r\n          \"model\": \"virtio\",\r\n          \"network\": \"wan-net\"\r\n          },\r\n          {\r\n          \"nicid\": 2,\r\n          \"model\": \"virtio\",\r\n          \"network\": \"{{NET2}}\"\r\n          },\r\n          {\r\n          \"nicid\": 3,\r\n          \"model\": \"virtio\",\r\n          \"network\": \"{{NET4}}\"\r\n          }\r\n        ]\r\n      },\r\n      \"kpi_data\": {\r\n        \"kpi\": {\r\n          \"event_name\": \"VM_ALIVE\",\r\n          \"metric_value\": \"1\",\r\n          \"metric_cond\": \"GT\",\r\n          \"metric_type\": \"UINT32\",\r\n          \"metric_collector\": {\r\n            \"type\": \"ICMPPing\",\r\n            \"nicid\": 0,\r\n            \"poll_frequency\": 3,\r\n            \"polling_unit\": \"seconds\",\r\n            \"continuous_alarm\": false\r\n          }\r\n        }\r\n      },\r\n      \"rules\": {\r\n        \"admin_rules\": {\r\n          \"rule\": {\r\n            \"event_name\": \"VM_ALIVE\",\r\n            \"action\": [\r\n              \"ALWAYS log\",\r\n              \"FALSE recover autohealing\",\r\n              \"TRUE servicebooted.sh\"\r\n            ]\r\n          }\r\n        }\r\n      },\r\n      \"config_data\": {\r\n        \"configuration\": {\r\n          \"dst\": \"bootstrap_config\",\r\n          \"variable\": [{\r\n            \"name\": \"ORGNAME\",\r\n            \"val\": \"{{ORGNAME}}\"\r\n            },\r\n            {\r\n            \"name\": \"OTP\",\r\n            \"val\": \"{{OTP}}\"\r\n            },\r\n            {\r\n            \"name\": \"SITEID\",\r\n            \"val\": \"{{SITEID}}\"\r\n            },\r\n            {\r\n            \"name\": \"SYSTEMIP\",\r\n            \"val\": \"{{SYSTEMIP}}\"\r\n            },\r\n            {\r\n            \"name\": \"UUID\",\r\n            \"val\": \"{{UUID}}\"\r\n            },\r\n            {\r\n            \"name\": \"VBOND\",\r\n            \"val\": \"{{VBOND}}\"\r\n            }\r\n          ]\r\n        }\r\n      }\r\n    }\r\n  }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/vm_lifecycle/tenants/tenant/admin/deployments",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"vm_lifecycle",
+								"tenants",
+								"tenant",
+								"admin",
+								"deployments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get vEdge Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b33a0fcb-aa21-465a-ba95-584ca331f4ef",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"// Identify which template we need to find.",
+									"var device = postman.getEnvironmentVariable(\"UUID\");",
+									"",
+									"for (var data in jsonData) {",
+									"    // Iterate through the array of data for the right device's status",
+									"    for (var i = 0; i < jsonData[data].length; i++) {",
+									"        // Use the index (i) to iterate through the devices",
+									"        var curDevice = jsonData[\"data\"][i][\"uuid\"];",
+									"        // Use a match condition to identify the device of interest",
+									"        if (curDevice === device) {",
+									"            // Assign Environment Variables for the status to be used later.",
+									"            var devStatus = jsonData[\"data\"][i][\"vmanageConnectionState\"];",
+									"        }",
+									"    }",
+									"}",
+									"tests[\"Checking vEdge Status\"] = responseCode.code === 200;",
+									"",
+									"if (devStatus == \"connected\"){",
+									"    tests[\"vEdge Registered to vManage\"] = responseCode.code === 200;",
+									"    postman.setNextRequest(\"Get vEdge Template ID\");",
+									"} else {",
+									"    postman.setNextRequest(\"Insert 10 Second Delay - vedge\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "C1sc0_123",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "saveHelperData",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "showPassword",
+									"value": false,
+									"type": "boolean"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "{{Content-Type}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{vManage}}/dataservice/system/device/vedges",
+							"host": [
+								"{{vManage}}"
+							],
+							"path": [
+								"dataservice",
+								"system",
+								"device",
+								"vedges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert 10 Second Delay - vedge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7347a3c7-51a6-4ba7-b3db-083e272edcc4",
+								"exec": [
+									"tests[\"Paused 10 Seconds\"] = responseCode.code === 200;",
+									"",
+									"postman.setNextRequest(\"Get vEdge Status\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://postman-echo.com/delay/10",
+							"protocol": "https",
+							"host": [
+								"postman-echo",
+								"com"
+							],
+							"path": [
+								"delay",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get vEdge Template ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "834fd53d-83fc-475a-aa4e-468613b81846",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"// Identify which template we need to find.",
+									"var template = postman.getEnvironmentVariable(\"template-name\");",
+									"console.log(template);",
+									"",
+									"for (var data in jsonData) {",
+									"    // Iterate through the array of data for the various tempalates",
+									"    for (var i = 0; i < jsonData[data].length; i++) {",
+									"        // Use the index (i) to assign the current tamplate name to the variable curTemp",
+									"        var curTemp = jsonData[\"data\"][i][\"templateName\"];",
+									"        console.log(curTemp);",
+									"        // Use a match condition to identify the template of interest",
+									"        if (curTemp === template) {",
+									"            // Assign Environment Variables for the template ID to be used later.",
+									"            postman.setEnvironmentVariable(\"templateId\", jsonData[\"data\"][i][\"templateId\"]);",
+									"            tests[\"Found vEdge Template ID\"] = curTemp === template;",
+									"            console.log(jsonData[\"data\"][i][\"templateId\"]);",
+									"        }",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "C1sc0_123",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "saveHelperData",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "showPassword",
+									"value": false,
+									"type": "boolean"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{vManage}}/dataservice/template/device",
+							"host": [
+								"{{vManage}}"
+							],
+							"path": [
+								"dataservice",
+								"template",
+								"device"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert 10 Second Delay - template",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7347a3c7-51a6-4ba7-b3db-083e272edcc4",
+								"exec": [
+									"tests[\"Paused 10 Seconds\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://postman-echo.com/delay/10",
+							"protocol": "https",
+							"host": [
+								"postman-echo",
+								"com"
+							],
+							"path": [
+								"delay",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Attach Template to vEdge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "68ccc751-b2ea-47c7-bfa3-a0c76bad1951",
+								"exec": [
+									"tests[\"Push Template to New vEdge\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "C1sc0_123",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "saveHelperData",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "showPassword",
+									"value": false,
+									"type": "boolean"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"deviceTemplateList\":[\n  {\n    \"templateId\":\"{{templateId}}\", \n    \"device\":[                              \n    {\n      \"csv-status\":\"complete\",\n      \"csv-deviceId\":\"{{UUID}}\",\n      \"csv-deviceIP\":\"{{SYSTEMIP}}\",\n      \"csv-host-name\":\"vedgecloud1\",\n      \"/1/ge0/2/interface/ip/address\": \"{{LAN_IP}}\",\n      \"//system/host-name\":\"{{VEDGENAME}}\",\n      \"//system/system-ip\":\"{{SYSTEMIP}}\",\n      \"//system/site-id\":\"{{SITEID}}\",\n      \"csv-templateId\":\"{{templateId}}\",\n      \"selected\":\"true\"\n    }\n    ],\n    \"isEdited\":false,     \n    \"isMasterEdited\":false  \n  }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{vManage}}/dataservice/template/device/config/attachfeature",
+							"host": [
+								"{{vManage}}"
+							],
+							"path": [
+								"dataservice",
+								"template",
+								"device",
+								"config",
+								"attachfeature"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deploy vRiverbed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4211518b-59ae-4be3-9709-4bfd3dfb3ab4",
+								"exec": [
+									"tests[\"vRiverbed Started Deploying\"] = responseCode.code === 201"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"deployment\": {\n    \"name\": \"{{RBEDNAME}}\",\n    \"vm_group\": {\n      \"name\": \"{{RBEDNAME}}\",\n      \"image\": \"{{IMAGE2}}\",\n      \"flavor\": \"{{FLAVOR2}}\",\n      \"vim_vm_name\": \"{{RBEDNAME}}\",\n      \"bootup_time\": -1,\n      \"recovery_wait_time\": 0,\n      \"interfaces\": {\n        \"interface\": [{\n          \"nicid\": 0,\n          \"model\": \"virtio\",\n          \"network\": \"lan-net\"\n          },\n          {\n          \"nicid\": 1,\n          \"model\": \"virtio\",\n          \"network\": \"{{NET5}}\"\n          },\n          {\n          \"nicid\": 2,\n          \"model\": \"virtio\",\n          \"network\": \"lan-net\"\n          },\n          {\n          \"nicid\": 3,\n          \"model\": \"virtio\",\n          \"network\": \"{{NET4}}\"\n          }\n        ]\n      },\n      \"kpi_data\": {\n        \"kpi\": {\n          \"event_name\": \"VM_ALIVE\",\n          \"metric_value\": \"1\",\n          \"metric_cond\": \"GT\",\n          \"metric_type\": \"UINT32\",\n          \"metric_collector\": {\n            \"type\": \"ICMPPing\",\n            \"nicid\": 0,\n            \"poll_frequency\": 3,\n            \"polling_unit\": \"seconds\",\n            \"continuous_alarm\": false\n          }\n        }\n      },\n      \"rules\": {\n        \"admin_rules\": {\n          \"rule\": {\n            \"event_name\": \"VM_ALIVE\",\n            \"action\": [\n              \"ALWAYS log\",\n              \"FALSE recover autohealing\",\n              \"TRUE servicebooted.sh\"\n            ]\n          }\n        }\n      },\n      \"config_data\": {\n        \"configuration\": {\n          \"dst\": \"bootstrap_config\",\n          \"variable\": [{\n            \"name\": \"INPATH_IP_ADDRESS\",\n            \"val\": \"{{INPATH_IP_ADDRESS}}\"\n            },\n            {\n            \"name\": \"GATEWAY\",\n            \"val\": \"{{GATEWAY}}\"\n            },\n            {\n            \"name\": \"HOSTNAME\",\n            \"val\": \"{{RBEDNAME}}\"\n            },\n            {\n            \"name\": \"SCC_SERVER_IP\",\n            \"val\": \"{{SCC_SERVER_IP}}\"\n            }\n          ]\n        }\n      }\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/vm_lifecycle/tenants/tenant/admin/deployments",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"vm_lifecycle",
+								"tenants",
+								"tenant",
+								"admin",
+								"deployments"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "This Collection - will download a vEdge and Riverbed image, then enable new networks to connect them.  Finally it turns up the vEdge."
+		},
+		{
+			"name": "Cleanup CSP",
+			"item": [
+				{
+					"name": "Decommission vEdge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bec1617b-db76-4501-86ee-83ef2c666e32",
+								"exec": [
+									"tests[\"Decommission vEdge from vCenter\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "C1sc0_123",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "saveHelperData",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "showPassword",
+									"value": false,
+									"type": "boolean"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "{{Content-Type}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{vManage}}/dataservice/system/device/decommission/{{UUID}}",
+							"host": [
+								"{{vManage}}"
+							],
+							"path": [
+								"dataservice",
+								"system",
+								"device",
+								"decommission",
+								"{{UUID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Running VNFs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bf7b2d1c-8159-433a-abda-57a9693a1362",
+								"exec": [
+									"if (responseCode.code === 204) {",
+									"    // Check to ensure there is at least 1 VNF running.",
+									"    //console.log(responseCode.code);",
+									"    postman.setNextRequest(\"Get Networks\");",
+									"    tests[\"No VNFs Deployed\"] = responseCode.code === 204;",
+									"}",
+									"else {",
+									"  var jsonData = JSON.parse(responseBody);",
+									"  var numVNFs = jsonData[\"vmlc:deployments\"][\"deployment\"].length;",
+									"",
+									"  if (numVNFs > 0) {",
+									"      var vnfName = jsonData[\"vmlc:deployments\"][\"deployment\"][0][\"name\"];",
+									"      console.log(vnfName);",
+									"      postman.setEnvironmentVariable(\"VNF\"+0, vnfName);",
+									"      postman.setNextRequest(\"Delete VNF\");",
+									"  }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/vm_lifecycle/tenants/tenant/admin/deployments",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"vm_lifecycle",
+								"tenants",
+								"tenant",
+								"admin",
+								"deployments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Running VNFs Detailed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/vm_lifecycle/tenants/tenant/admin/deployments?deep",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"vm_lifecycle",
+								"tenants",
+								"tenant",
+								"admin",
+								"deployments"
+							],
+							"query": [
+								{
+									"key": "deep",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete VNF",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c7842dd8-a9c8-4659-9067-d322dd937547",
+								"type": "text/javascript",
+								"exec": [
+									"postman.clearEnvironmentVariable(\"VNF0\");",
+									"",
+									"tests[\"VNF Deleted Successfully\"] = responseCode.code === 204;",
+									"",
+									"postman.setNextRequest(\"Get Running VNFs\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/vm_lifecycle/tenants/tenant/admin/deployments/deployment/{{VNF0}}",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"vm_lifecycle",
+								"tenants",
+								"tenant",
+								"admin",
+								"deployments",
+								"deployment",
+								"{{VNF0}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Networks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1f3e0686-42d7-43ba-b4b9-ed566c893aa6",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"var numberNets = jsonData[\"network:networks\"][\"network\"].length;",
+									"console.log(numberNets);",
+									"",
+									"if (numberNets > 2) {",
+									"    var netName = jsonData[\"network:networks\"][\"network\"][2][\"name\"];",
+									"    var brName = jsonData[\"network:networks\"][\"network\"][2][\"bridge\"];",
+									"    //Assign netName and bridgeName for the current network and bridgee ",
+									"    postman.setEnvironmentVariable(\"NET\"+\"2\", netName);",
+									"    postman.setEnvironmentVariable(\"BR\"+\"2\", brName);",
+									"    //Set the Environment variable with the current iterated name.",
+									"    postman.setNextRequest(\"Delete Extra Network\");",
+									"  }",
+									"else {",
+									"  postman.setNextRequest(\"Assign Ethernets Back to LAN Net\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/networks?deep",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"networks"
+							],
+							"query": [
+								{
+									"key": "deep",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Extra Network",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0067472f-9f47-40b0-b732-6cc42a1df2f5",
+								"type": "text/javascript",
+								"exec": [
+									"postman.clearEnvironmentVariable(\"NET2\");",
+									"",
+									"tests[\"Deleted Network Successfully\"] = responseCode.code === 204",
+									"",
+									"postman.setNextRequest(\"Delete Extra Bridge\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/networks/network/{{NET2}}",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"networks",
+								"network",
+								"{{NET2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Extra Bridge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2f60da37-2eb4-4442-8542-a4f7a99ee310",
+								"type": "text/javascript",
+								"exec": [
+									"postman.clearEnvironmentVariable(\"BR2\");",
+									"",
+									"tests[\"Deleted Bridge Successfully\"] = responseCode.code === 204",
+									"",
+									"postman.setNextRequest(\"Get Networks\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/bridges/bridge/{{BR2}}",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"bridges",
+								"bridge",
+								"{{BR2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Ethernets Back to LAN Net",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3d44a07f-0bf4-4923-9d0c-53d096754fdd",
+								"exec": [
+									"tests[\"Changed Ports Assigned to LAN-Net\"] = responseCode.code === 204"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"bridge\": {\r\n    \"name\": \"lan-br\",\r\n    \"port\": [\r\n    \t{\r\n\t\t\"name\": \"eth1\"\r\n\t\t},\r\n    \t{\r\n\t\t\"name\": \"eth2\"\r\n\t\t},\r\n\t\t{\r\n\t\t\"name\": \"eth3\"\r\n\t\t},\r\n\t\t{\r\n\t\t\"name\": \"eth4\"\r\n\t\t},\r\n\t\t{\r\n\t\t\"name\": \"eth5\"\r\n\t\t}\r\n\t]\t\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/bridges/bridge/lan-br",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"bridges",
+								"bridge",
+								"lan-br"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get System Information",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "57d91df3-f988-4c0b-bca4-4b497213f23e",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "{{Content-Type}}"
+							},
+							{
+								"key": "Accept",
+								"value": "{{Accept}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{NFVIS}}/api/config/system/settings",
+							"host": [
+								"{{NFVIS}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"system",
+								"settings"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "8e3504a8-100e-4f30-b4cb-db3247f1f5e7",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "70d9c670-ee78-4077-b384-0952f36e6ec7",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Get Image Information",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "57d91df3-f988-4c0b-bca4-4b497213f23e",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "{{Content-Type}}"
+					},
+					{
+						"key": "Accept",
+						"value": "{{Accept}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{NFVIS}}/api/config/vm_lifecycle/images",
+					"host": [
+						"{{NFVIS}}"
+					],
+					"path": [
+						"api",
+						"config",
+						"vm_lifecycle",
+						"images"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get System Information",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "57d91df3-f988-4c0b-bca4-4b497213f23e",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "{{Content-Type}}"
+					},
+					{
+						"key": "Accept",
+						"value": "{{Accept}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{NFVIS}}/api/operational/system/settings-native",
+					"host": [
+						"{{NFVIS}}"
+					],
+					"path": [
+						"api",
+						"operational",
+						"system",
+						"settings-native"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Platform Information",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "57d91df3-f988-4c0b-bca4-4b497213f23e",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "C1sco12345#",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "saveHelperData",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "{{Content-Type}}"
+					},
+					{
+						"key": "Accept",
+						"value": "{{Accept}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{NFVIS}}/api/operational/platform-detail",
+					"host": [
+						"{{NFVIS}}"
+					],
+					"path": [
+						"api",
+						"operational",
+						"platform-detail"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get List of vEdges",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "C1sc0_123",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "saveHelperData",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "{{Content-Type}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{vManage}}/dataservice/system/device/vedges",
+					"host": [
+						"{{vManage}}"
+					],
+					"path": [
+						"dataservice",
+						"system",
+						"device",
+						"vedges"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get vEdge Template Variables",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "C1sc0_123",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "saveHelperData",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"templateId\": \"{{templateId}}\",  \n  \"deviceIds\":\n    [                    \n       \"{{UUID}}\"\n    ],\n  \"isEdited\":false,        \n  \"isMasterEdited\":false              \n}"
+				},
+				"url": {
+					"raw": "{{vManage}}/dataservice/template/device/config/input",
+					"host": [
+						"{{vManage}}"
+					],
+					"path": [
+						"dataservice",
+						"template",
+						"device",
+						"config",
+						"input"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get VM Flavor Info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "57d91df3-f988-4c0b-bca4-4b497213f23e",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "{{Content-Type}}"
+					},
+					{
+						"key": "Accept",
+						"value": "{{Accept}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{NFVIS}}/api/config/vm_lifecycle/flavors/flavor/ISRv-small?deep",
+					"host": [
+						"{{NFVIS}}"
+					],
+					"path": [
+						"api",
+						"config",
+						"vm_lifecycle",
+						"flavors",
+						"flavor",
+						"ISRv-small"
+					],
+					"query": [
+						{
+							"key": "deep",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Image Information",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "57d91df3-f988-4c0b-bca4-4b497213f23e",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "{{Content-Type}}"
+					},
+					{
+						"key": "Accept",
+						"value": "{{Accept}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{NFVIS}}/api/config/vm_lifecycle/images/image/isrv-universalk9.16.05.01.tar.gz?deep",
+					"host": [
+						"{{NFVIS}}"
+					],
+					"path": [
+						"api",
+						"config",
+						"vm_lifecycle",
+						"images",
+						"image",
+						"isrv-universalk9.16.05.01.tar.gz"
+					],
+					"query": [
+						{
+							"key": "deep",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "C1sco12345#",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "admin",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "d4b14343-bfcc-4547-9867-894e0fa83ea4",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "1174575b-e7bc-4669-9988-0dd04b972646",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
